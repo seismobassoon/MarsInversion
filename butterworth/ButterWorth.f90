@@ -309,9 +309,9 @@ program mtInversion
   enddo
 
 
-  open(unit=1,file=inversionName//".inv_result",status='unknown')
-  open(unit=2,file=inversionName//".raw_var",status='unknown')
-  open(unit=3,file=inversionName//".tap_var",status='unknown')
+  open(unit=1,file=trim(inversionName)//".inv_result",status='unknown')
+  open(unit=2,file=trim(inversionName)//".raw_var",status='unknown')
+  open(unit=3,file=trim(inversionName)//".tap_var",status='unknown')
   do iConfiguration=1,nConfiguration
      do iMovingWindowStep=1,nTimeStep
         iMovingWindow=iMovingWindowStep*ntStep
