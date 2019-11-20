@@ -49,19 +49,19 @@ program mtInversion
   allocate(misfitTaper(1:nmt,1:npData-np+1,1:nConfiguration))
   allocate(misfitRaw(1:nmt,1:npData-np+1,1:nConfiguration))
 
-  allocate(varZ(1:npData-np+1,1:Configuration))
-  allocate(varN(1:npData-np+1,1:Configuration))
-  allocate(varE(1:npData-np+1,1:Configuration))
-  allocate(modZ(1:npData-np+1,1:Configuration))
-  allocate(modN(1:npData-np+1,1:Configuration))
-  allocate(modE(1:npData-np+1,1:Configuration))     
+  allocate(varZ(1:npData-np+1,1:nConfiguration))
+  allocate(varN(1:npData-np+1,1:nConfiguration))
+  allocate(varE(1:npData-np+1,1:nConfiguration))
+  allocate(modZ(1:npData-np+1,1:nConfiguration))
+  allocate(modN(1:npData-np+1,1:nConfiguration))
+  allocate(modE(1:npData-np+1,1:nConfiguration))     
 
-  allocate(varRawZ(1:npData-np+1,1:Configuration))
-  allocate(varRawN(1:npData-np+1,1:Configuration))
-  allocate(varRawE(1:npData-np+1,1:Configuration))
-  allocate(modRawZ(1:npData-np+1,1:Configuration))
-  allocate(modRawN(1:npData-np+1,1:Configuration))
-  allocate(modRawE(1:npData-np+1,1:Configuration))     
+  allocate(varRawZ(1:npData-np+1,1:nConfiguration))
+  allocate(varRawN(1:npData-np+1,1:nConfiguration))
+  allocate(varRawE(1:npData-np+1,1:nConfiguration))
+  allocate(modRawZ(1:npData-np+1,1:nConfiguration))
+  allocate(modRawN(1:npData-np+1,1:nConfiguration))
+  allocate(modRawE(1:npData-np+1,1:nConfiguration))     
 
 
   taper=0.d0
@@ -258,19 +258,31 @@ program mtInversion
            write(23,*) dt*dble(it), obsRawArray(it,1), obsRawArray(it,2), obsRawArray(it,3)
            write(24,*) dt*dble(it), obsArray(it,1), obsArray(it,2), obsArray(it,3)
 
-           varZ=varZ+obsArray(it,1)**2
-           varN=varN+obsArray(it,2)**2
-           varE=varE+obsArray(it,3)**2
-           modZ=modZ+(modArray(it,1)-obsArray(it,1))**2
-           modN=modN+(modArray(it,2)-obsArray(it,2))**2
-           modE=modE+(modArray(it,3)-obsArray(it,3))**2
+           varZ(iMovingWindow,iConfiguration)= &
+                varZ(iMovingWindow,iConfiguration)+obsArray(it,1)**2
+           varN(iMovingWindow,iConfiguration)= &
+                varN(iMovingWindow,iConfiguration)+obsArray(it,2)**2
+           varE(iMovingWindow,iConfiguration)= &
+                varE(iMovingWindow,iConfiguration)+obsArray(it,3)**2
+           modZ(iMovingWindow,iConfiguration)= &
+                modZ(iMovingWindow,iConfiguration)+(modArray(it,1)-obsArray(it,1))**2
+           modN(iMovingWindow,iConfiguration)= &
+                modN(iMovingWindow,iConfiguration)+(modArray(it,2)-obsArray(it,2))**2
+           modE(iMovingWindow,iConfiguration)= &
+                modE(iMovingWindow,iConfiguration)+(modArray(it,3)-obsArray(it,3))**2
 
-           varRawZ=varZ+obsRawArray(it,1)**2
-           varRawN=varN+obsRawArray(it,2)**2
-           varRawE=varE+obsRawArray(it,3)**2
-           modRawZ=modZ+(modRawArray(it,1)-obsRawArray(it,1))**2
-           modRawN=modN+(modRawArray(it,2)-obsRawArray(it,2))**2
-           modRawE=modE+(modRawArray(it,3)-obsRawArray(it,3))**2
+           varRawZ(iMovingWindow,iConfiguration)= &
+                varZ(iMovingWindow,iConfiguration)+obsRawArray(it,1)**2
+           varRawN(iMovingWindow,iConfiguration)= &
+                varN(iMovingWindow,iConfiguration)+obsRawArray(it,2)**2
+           varRawE(iMovingWindow,iConfiguration)= &
+                varE(iMovingWindow,iConfiguration)+obsRawArray(it,3)**2
+           modRawZ(iMovingWindow,iConfiguration)= &
+                modZ(iMovingWindow,iConfiguration)+(modRawArray(it,1)-obsRawArray(it,1))**2
+           modRawN(iMovingWindow,iConfiguration)= &
+                modN(iMovingWindow,iConfiguration)+(modRawArray(it,2)-obsRawArray(it,2))**2
+           modRawE(iMovingWindow,iConfiguration)= &
+                modE(iMovingWindow,iConfiguration)+(modRawArray(it,3)-obsRawArray(it,3))**2
 
         enddo
 
