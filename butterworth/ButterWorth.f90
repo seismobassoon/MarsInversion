@@ -207,7 +207,7 @@ program mtInversion
      ! Here we taper the observed function for each moving window of np
      
      do iMovingWindowStep=1,nTimeStep
-        iMovingWindow=iMovingWindowStep*ntStep
+        iMovingWindow=(iMovingWindowStep-1)*ntStep+1
         do icomp=1,3
            obsRawArray(1:np,icomp)=obsFilt(iMovingWindow:iMovingWindow+np-1,icomp)
            obsArray(1:np,icomp)=obsRawArray(1:np,icomp)*taper(1:np)
@@ -282,7 +282,6 @@ program mtInversion
                 modN(iMovingWindowStep,iConfiguration)+(modArray(it,2)-obsArray(it,2))**2
            modE(iMovingWindowStep,iConfiguration)= &
                 modE(iMovingWindowStep,iConfiguration)+(modArray(it,3)-obsArray(it,3))**2
-
            varRawZ(iMovingWindowStep,iConfiguration)= &
                 varZ(iMovingWindowStep,iConfiguration)+obsRawArray(it,1)**2
            varRawN(iMovingWindowStep,iConfiguration)= &
@@ -315,11 +314,13 @@ program mtInversion
   do iConfiguration=1,nConfiguration
      do iMovingWindowStep=1,nTimeStep
         iMovingWindow=iMovingWindowStep*ntStep
-        write(1,*) iConfiguration, dble(iMovingWindow)*dt, mtInverted(1:nmt,iMovingWindowStep,iConfiguration)
-        write(2,*) iConfiguration, dble(iMovingWindow)*dt, &
+        iMovingWindow=(iMovingWindowStep-1)*ntStep+1
+        write(1,*) iConfiguration, dble(iMovingWindow-1)*dt, &
+             mtInverted(1:nmt,iMovingWindowStep,iConfiguration)
+        write(2,*) iConfiguration, dble(iMovingWindow-1)*dt, &
              modRawZ(iMovingWindowStep,iConfiguration),modRawN(iMovingWindowStep,iConfiguration), &
              modRawE(iMovingWindowStep,iConfiguration)
-        write(3,*) iConfiguration, dble(iMovingWindow)*dt, &
+        write(3,*) iConfiguration, dble(iMovingWindow-1)*dt, &
              modZ(iMovingWindowStep,iConfiguration),modN(iMovingWindowStep,iConfiguration), &
              modE(iMovingWindowStep,iConfiguration)
      enddo

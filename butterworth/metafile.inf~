@@ -5,11 +5,14 @@
 #
 #                                                                     Nov. 2019 N. Fuji
 #
+#   usage:   ./MarsInversion metafile.inf ../data result testInv
+#
 # synthetics <moment tensor>_sta_<station_number>.txt, col 1 = time, col 2 = N, col 3 = E, col 4 = Z 
 # computation mode (normal:normal; test:filter the GF and stop: fort.11-14)
 test
 0.025d0  # delta t in seconds
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
+100.0d0 # moving window step in seconds
 # butterworth filters (order, fmin, fmax)
 4 # order (integer)
 0.01 # min frequency (in Hz)
