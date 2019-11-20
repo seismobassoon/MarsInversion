@@ -13,7 +13,7 @@ program mtInversion
   implicit none
 
   integer :: mtcomp,jmtcomp
-  integer ::icomp,iWindow,it
+  integer ::icomp,iWindow,it,jjj
   integer :: iMovingWindow,iConfiguration
   real(kind(0d0)), allocatable :: taper(:)
   real(kind(0d0)), allocatable :: tmparray(:,:,:)
@@ -26,7 +26,7 @@ program mtInversion
   real(kind(0d0)), allocatable  :: mtInverted(:,:,:)
   real(kind(0d0)), allocatable :: misfitTaper(:,:,:)
   real(kind(0d0)), allocatable :: misfitRaw(:,:,:)
-  character(200) :: synfile
+  character(200) :: synfile,tmpfile,list
   real(kind(0d0)) :: dummyFloat
   real(kind(0d0)), allocatable :: varZ(:,:),varN(:,:),varE(:,:)
   real(kind(0d0)), allocatable :: modZ(:,:),modN(:,:),modE(:,:)
@@ -130,20 +130,15 @@ program mtInversion
         enddo
      enddo
      
+     if(calculMode.eq.1) then
+        do it=1,npData
+           write(11,*) dble(it)*dt,obsRaw(it,1),obsFilt(it,1)
+           write(12,*) dble(it)*dt,obsRaw(it,2),obsFilt(it,2)
+           write(13,*) dble(it)*dt,obsRaw(it,3),obsFilt(it,3)
+        enddo
+     endif
 
-     open(11,file="synZ"//iConfiguration//".txt",status='unknown')
-     open(12,file="synN"//iConfiguration//".txt",status='unknown')
-     open(13,file="synE"//iConfiguration//".txt",status='unknown')
-     do it=1,npData
-        write(11,*) dble(it)*dt,obsRaw(it,1),obsFilt(it,1)
-        write(12,*) dble(it)*dt,obsRaw(it,2),obsFilt(it,2)
-        write(13,*) dble(it)*dt,obsRaw(it,3),obsFilt(it,3)
-     enddo
-     close(11)
-     close(12)
-     close(13)
 
-     if(calculMode.eq.1) stop
 
      
      ! Construct AtA
@@ -228,15 +223,23 @@ program mtInversion
            modArray(1:np,1:3)=modArray(1:np,1:3) &
                 +GreenArray(1:np,1:3,mtcomp)*mtInverted(mtcomp,iMovingWindow,iConfiguration)
         enddo
+
+        write(list,'(I7,".",I7)') iConfiguration,iMovingWindow
+        do jjj=1,15
+           if(list(jjj:jjj).eq.' ') list(jjj:jjj)='0'
+        enddo
+
+        tmpfile=trim(resultDir)//trim(list)//"modRaw.dat"
+        open(unit=21,file=tmpfile,status='unknown')
+
+        tmpfile=trim(resultDir)//trim(list)//"mod.dat"
+        open(unit=22,file=tmpfile,status='unknown')
         
-        open(unit=21,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
-             //"modRaw.dat",status='unknown')
-        open(unit=22,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
-              //"mod.dat",status='unknown')
-        open(unit=23,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
-             //"obsRaw.dat",status='unknown')
-        open(unit=24,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
-              //"obs.dat",status='unknown')       
+        tmpfile=trim(resultDir)//trim(list)//"obsRaw.dat"
+        open(unit=23,file=tmpfile,status='unknown')
+
+        tmpfile=trim(resultDir)//trim(list)//"obs.dat"
+        open(unit=24,file=tmpfile,status='unknown')       
 
         varZ(iMovingWindow,iConfiguration)=0.d0
         varN(iMovingWindow,iConfiguration)=0.d0
