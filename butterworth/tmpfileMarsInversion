@@ -1,16 +1,16 @@
-test                                                                                                                                                                                                    
+normal                                                                                                                                                                                                  
 0.025d0  # delta t in seconds                                                                                                                                                                           
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)                                                                                     
-100.0d0 # moving window step in seconds                                                                                                                                                                 
+100.0d0 # moving window step in seconds (normally smaller than the dominant period?)                                                                                                                    
 4 # order (integer)                                                                                                                                                                                     
 0.01 # min frequency (in Hz)                                                                                                                                                                            
-0.05 # max frequency (in Hz)                                                                                                                                                                            
+0.5 # max frequency (in Hz)                                                                                                                                                                             
 1                                                                                                                                                                                                       
-400.0 410.0 480.0 500.0                                                                                                                                                                                 
-1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above                                                                          
-US.EYMN..BHN.M.1999-10-16T094831.396000.txt                                                                                                                                                             
-US.EYMN..BHE.M.1999-10-16T094831.396000.txt                                                                                                                                                             
-US.EYMN..BHZ.M.1999-10-16T094831.396000.txt                                                                                                                                                             
+0.0 200.0 800.0 1000.0                                                                                                                                                                                  
+1000.d0                                                                                                                                                                                                 
+fakeZ.data.fake                                                                                                                                                                                         
+fakeN.data.fake                                                                                                                                                                                         
+fakeE.data.fake                                                                                                                                                                                         
 2                                                                                                                                                                                                       
 mininffile0.inf                                                                                                                                                                                         
 mininffile1.inf                                                                                                                                                                                         

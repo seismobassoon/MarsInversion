@@ -1,7 +1,7 @@
 # makefile Butterworth 
 
 FC      = gfortran
-FFLAGS  = -O3
+FFLAGS  = -g -Wall -Wextra -Warray-temporaries -Wconversion -fimplicit-none -fbacktrace -ffree-line-length-0
 OBJS0    = module.f90 others.f90 Butterworth.f90
 program0=MarsInversion
 #program1=tipsvSingle

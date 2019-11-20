@@ -4,7 +4,7 @@ module parameters
   real(kind(0d0)), parameter :: pi=3.1415926535897932d0
   integer :: npButterworth
   real(kind(0d0)) :: fmin,fmax
-  real(kind(0d0)) :: eps ! tolerance during MT inversion 
+  real(kind(0d0)) :: eps=1.d-5 ! tolerance during MT inversion 
   integer, parameter :: nmt = 6
   integer :: np ! integer length of synthetics (to be considered)
   integer :: npData ! integer lenght of observed 

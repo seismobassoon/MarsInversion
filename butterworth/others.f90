@@ -1,58 +1,3 @@
-subroutine invbyCG(nd,ata,atd,eps,x)
-  ! modified from invbyCG Jun. 2009 Nobuaki Fuji
-  !       
-  !                       Nov. 2019 Nobuaki Fuji
-
-  implicit none
-  integer :: nd, ii
-  real(kind(0d0)) :: ata(1:nd,1:nd)
-  real(kind(0d0)) :: x(1:nd),r(1:nd),w(1:nd),z(1:nd),x0(1:nd),atd(1:nd)
-  real(kind(0d0)) :: eps
-  real(8) :: a, b, residual,initres,threshold,paap
-
-  x0 = 0
-    
-  r = atd - matmul(ata,x0)
-  w = -r
-  z = matmul(ata,w)
-  a = dot_product(r,w) / dot_product(w,z)
-  x = x0 +a*w
-  b = 0
-
-  initres=dot_product(atd,atd)
-  threshold=eps*initres
-  
-  do ii=1,nd
-     r = r - a*z
-     residual=dot_product(r,r)
-
-     if(residual.le.threshold) exit
- 
-     b = dot_product(r,z)/dot_product (w,z)
-     w = -r + b*w
-     z = matmul(ata,w)
-     
-     !for pAAp calculation
-     paap = dot_product(w,z)
-     !end for pAAp calculation
-     
-     a = dot_product(r,w)/dot_product(w,z)
-     x = x+a*w
-     
-  enddo
-
-  
-
-end subroutine invbyCG
-
-
-
-
-
-
-
-
-
 subroutine pinput
 
   use parameters
@@ -75,6 +20,15 @@ subroutine pinput
   resultDir=argv
   call getarg(4,argv)
   inversionName=argv
+  
+  argc=iargc()
+  
+  if(argc.ne.4) then 
+     print *, "you need <metafile> <working directory> <result directory> <inversion name>"
+     print *, "cheers"
+     stop
+  endif
+
   
   !write(tmpfile,"(Z5.5)") getpid()
   !tmpfile='tmpfileMarsInversion'//tmpfile
@@ -144,6 +98,151 @@ subroutine pinput
   close(1)
 
 end subroutine pinput
+
+
+
+subroutine inverse(aa,c,n)
+  !============================================================
+  ! Inverse matrix
+  ! Method: Based on Doolittle LU factorization for Ax=b
+  ! Alex G. December 2009
+  !-----------------------------------------------------------
+  ! input ...
+  ! a(n,n) - array of coefficients for matrix A
+  ! n      - dimension
+  ! output ...
+  ! c(n,n) - inverse matrix of A
+  ! comments ...
+  ! the original matrix a(n,n) will be destroyed 
+  ! during the calculation
+  !===========================================================
+  implicit none 
+  integer :: n
+  real(kind(0d0)) :: a(n,n), c(n,n),aa(n,n)
+  real(kind(0d0)) :: L(n,n), U(n,n), b(n), d(n), x(n)
+  real(kind(0d0)) :: coeff
+  integer :: i, j, k
+  
+  a=aa
+  
+  ! step 0: initialization for matrices L and U and b
+  ! Fortran 90/95 aloows such operations on matrices
+  L=0.0
+  U=0.0
+  b=0.0
+  
+  ! step 1: forward elimination
+  do k=1, n-1
+     do i=k+1,n
+        coeff=a(i,k)/a(k,k)
+        L(i,k) = coeff
+        do j=k+1,n
+           a(i,j) = a(i,j)-coeff*a(k,j)
+        enddo
+     enddo
+  enddo
+  
+  ! Step 2: prepare L and U matrices 
+  ! L matrix is a matrix of the elimination coefficient
+  ! + the diagonal elements are 1.0
+  do i=1,n
+     L(i,i) = 1.0
+  end do
+  ! U matrix is the upper triangular part of A
+  do j=1,n
+     do i=1,j
+        U(i,j) = a(i,j)
+     enddo
+  enddo
+  
+  ! Step 3: compute columns of the inverse matrix C
+  do k=1,n
+     b(k)=1.0
+     d(1) = b(1)
+     ! Step 3a: Solve Ld=b using the forward substitution
+     do i=2,n
+        d(i)=b(i)
+        do j=1,i-1
+           d(i) = d(i) - L(i,j)*d(j)
+        enddo
+     enddo
+     ! Step 3b: Solve Ux=d using the back substitution
+     x(n)=d(n)/U(n,n)
+     do i = n-1,1,-1
+        x(i) = d(i)
+        do j=n,i+1,-1
+           x(i)=x(i)-U(i,j)*x(j)
+        enddo
+        x(i) = x(i)/u(i,i)
+     enddo
+     ! Step 3c: fill the solutions x(n) into column k of C
+     do i=1,n
+        c(i,k) = x(i)
+     enddo
+     b(k)=0.0
+  enddo
+end subroutine inverse
+
+subroutine invbyCG(nd,ata,atd,eps,x)
+  ! modified from invbyCG Jun. 2009 Nobuaki Fuji
+  !       
+  !                       Nov. 2019 Nobuaki Fuji
+
+  implicit none
+  integer :: nd, ii
+  real(kind(0d0)) :: ata(1:nd,1:nd)
+  real(kind(0d0)) :: x(1:nd),r(1:nd),w(1:nd),z(1:nd),x0(1:nd),atd(1:nd)
+  real(kind(0d0)) :: eps
+  real(8) :: a, b, residual,initres,threshold,paap
+
+  x0 = 0.d0
+    
+  r = atd - matmul(ata,x0)
+  w = -r
+  z = matmul(ata,w)
+  a = dot_product(r,w) / dot_product(w,z)
+  x = x0 +a*w
+  b = 0
+
+  initres=dot_product(atd,atd)
+  threshold=eps*initres
+  
+
+  
+  do ii=1,nd
+
+     r = r - a*z
+     residual=dot_product(r,r)
+   
+     if(residual.le.threshold) exit
+ 
+     b = dot_product(r,z)/dot_product (w,z)
+     w = -r + b*w
+     z = matmul(ata,w)
+     
+     !for pAAp calculation
+     paap = dot_product(w,z)
+     !end for pAAp calculation
+     
+     a = dot_product(r,w)/dot_product(w,z)
+     x = x+a*w
+     
+  enddo
+
+
+  
+
+end subroutine invbyCG
+
+
+
+
+
+
+
+
+
+
 
 
 subroutine bwfilt(x,y,dt,n,irek,norder,f1,f2)
@@ -265,9 +364,9 @@ subroutine bpcoeff(f1,f2,npoles,dt,a,b1,b2)
   i = 1
   npol2 = npoles/2+1
   do n = 1,npoles
-    p = cexp(cmplx(0.d0,dble(2*n-1+npoles)*pi/dble(2*npoles)))
-    t1 = p*cmplx(w0,0.d0)
-    t2 = sqrt(t1*t1-cmplx(w1*w2,0.d0))
+    p = exp(dcmplx(0.d0,dble(2*n-1+npoles)*pi/dble(2*npoles)))
+    t1 = p*dcmplx(w0,0.d0)
+    t2 = sqrt(t1*t1-dcmplx(w1*w2,0.d0))
     s(i) = t1+t2
     s(i+1) = t1-t2
     i = i+2

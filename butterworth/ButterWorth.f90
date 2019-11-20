@@ -22,7 +22,7 @@ program mtInversion
   real(kind(0d0)), allocatable :: modArray(:,:),modRawArray(:,:)
   real(kind(0d0)), allocatable :: filtbefore(:),filtafter(:)
   real(kind(0d0)) :: xfwin
-  real(kind(0d0)), allocatable :: ata(:,:),atd(:)
+  real(kind(0d0)), allocatable :: ata(:,:),atd(:),atainv(:,:)
   real(kind(0d0)), allocatable  :: mtInverted(:,:,:)
   real(kind(0d0)), allocatable :: misfitTaper(:,:,:)
   real(kind(0d0)), allocatable :: misfitRaw(:,:,:)
@@ -33,6 +33,7 @@ program mtInversion
   real(kind(0d0)), allocatable :: varRawZ(:,:),varRawN(:,:),varRawE(:,:)
   real(kind(0d0)), allocatable :: modRawZ(:,:),modRawN(:,:),modRawE(:,:)
   integer :: nTimeStep
+  real(kind(0d0)) :: fakeMT(1:6)
 110 format(a200)
   ! making taper function
 
@@ -47,6 +48,7 @@ program mtInversion
 
 
   allocate(ata(1:nmt,1:nmt))
+  allocate(atainv(1:nmt,1:nmt))
   allocate(atd(1:nmt))
   allocate(mtInverted(1:nmt,1:nTimeStep,1:nConfiguration))
   allocate(misfitTaper(1:nmt,1:nTimeStep,1:nConfiguration))
@@ -104,7 +106,7 @@ program mtInversion
   allocate(modRawArray(1:np,1:3))
 
 
-
+  mtInverted=0.d0
   ! Grande boucle pour chaque configuration
 
   do iConfiguration=1,nConfiguration
@@ -126,6 +128,23 @@ program mtInversion
      
 
 
+     ! Make a fake series of observed waveforms for synthetic inversion
+     ! nothing to do with the inversion, comment out when we are on the production mode
+     !if(iConfiguration.eq.1) then
+     !   fakeMT=(/1.d0,2.d0,-10.d0,1.d0,3.d0,-2.d0/)
+     !   open(unit=4,file="fakeZ.data.fake",status='unknown')
+     !   open(unit=5,file="fakeN.data.fake",status='unknown')
+     !   open(unit=6,file="fakeE.data.fake",status='unknown')
+     !   do it=1,np
+     !      write(4,*) dot_product(fakeMT(1:6),(tmparray(it,1,1:6)))
+     !      write(5,*) dot_product(fakeMT(1:6),(tmparray(it,2,1:6)))
+     !      write(6,*) dot_product(fakeMT(1:6),(tmparray(it,3,1:6)))
+     !   enddo
+     !   close(4)
+     !   close(5)
+     !   close(6)
+     !endif
+
      ! Here we first filter Green's function as a whole and taper them
      
      do mtcomp=1,nmt
@@ -137,14 +156,7 @@ program mtInversion
         enddo
      enddo
      
-     if(calculMode.eq.1) then
-        do it=1,npData
-           write(11,*) dble(it)*dt,obsRaw(it,1),obsFilt(it,1)
-           write(12,*) dble(it)*dt,obsRaw(it,2),obsFilt(it,2)
-           write(13,*) dble(it)*dt,obsRaw(it,3),obsFilt(it,3)
-        enddo
-     endif
-
+  
 
 
      
@@ -167,14 +179,16 @@ program mtInversion
      enddo
      
      
+     ! Try the inverse of ata
      
-     
+     !call inverse(ata,atainv,mtcomp)
+
      !do mtcomp=1,nmt
      !   do jmtcomp=1,nmt
-     !      print *, mtcomp,jmtcomp,ata(mtcomp,jmtcomp)
-     !   enddo
+     !      print *, mtcomp,jmtcomp,ata(mtcomp,jmtcomp),atainv(mtcomp,jmtcomp)
+     !  enddo
      !enddo
-     
+     !stop
      
 !!!!!!! NOW WE START MT INVERSION FOR EACH TIME iMovingWindow
      
@@ -187,6 +201,7 @@ program mtInversion
         call bwfilt(obsRaw(1:npData,icomp),obsFilt(1:npData,icomp),dt,npData,1,npButterworth,fmin,fmax)
      enddo
      
+
      ! Raw data and filtered data are written as fort.11-13 for references
      
 
@@ -202,7 +217,7 @@ program mtInversion
      close(12)
      close(13)
 
-     
+     if(calculMode.eq.1) stop
      
      ! Here we taper the observed function for each moving window of np
      
@@ -216,13 +231,16 @@ program mtInversion
         ! Atd construction
         
         do mtcomp=1,nmt
-           atd=sum(GreenArray(1:np,1:3,mtcomp)*obsArray(1:np,1:3))
+           atd(mtcomp)=sum(GreenArray(1:np,1:3,mtcomp)*obsArray(1:np,1:3))
         enddo
        
       
         ! MT inversion by CG
         call invbyCG(nmt,ata,atd,eps,mtInverted(1:nmt,iMovingWindowStep,iConfiguration))
     
+        !mtInverted(1:nmt,iMovingWindowStep,iConfiguration)=matmul(atainv,atd)
+
+
         ! residual evaluation with/without tapering
         modRawArray=0.d0
         modArray=0.d0
@@ -327,10 +345,9 @@ program mtInversion
   enddo
   close(1)
   close(2)
-  
+  close(3)
      
- 
-  
+
      
   
 

@@ -9,25 +9,31 @@
 #
 # synthetics <moment tensor>_sta_<station_number>.txt, col 1 = time, col 2 = N, col 3 = E, col 4 = Z 
 # computation mode (normal:normal; test:filter the GF and stop: fort.11-14)
-test
+normal
 0.025d0  # delta t in seconds
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
-100.0d0 # moving window step in seconds
+100.0d0 # moving window step in seconds (normally smaller than the dominant period?)
 # butterworth filters (order, fmin, fmax)
 4 # order (integer)
 0.01 # min frequency (in Hz)
-0.05 # max frequency (in Hz)
+0.5 # max frequency (in Hz)
 # number of taper windows 
 1
 # t1, t2, t3, t4
-400.0 410.0 480.0 500.0
+#400.0 410.0 480.0 500.0
+0.0 200.0 800.0 1000.0
 # 
 # seismic data (N E Z) 
 #
-1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
-US.EYMN..BHN.M.1999-10-16T094831.396000.txt
-US.EYMN..BHE.M.1999-10-16T094831.396000.txt
-US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+#1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
+#US.EYMN..BHN.M.1999-10-16T094831.396000.txt
+#US.EYMN..BHE.M.1999-10-16T094831.396000.txt
+#US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+# here we use fake data with MT=/1.d0,2.d0,-10.d0,1.d0,3.d0,-2.d0/
+1000.d0
+fakeZ.data.fake
+fakeN.data.fake
+fakeE.data.fake
 # 
 # number of configurations (source location in 3D, model)
 2
