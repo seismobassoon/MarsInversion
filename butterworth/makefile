@@ -1,0 +1,19 @@
+# makefile Butterworth 
+
+FC      = gfortran
+FFLAGS  = -O3
+OBJS0    = module.f90 others.f90 Butterworth.f90
+program0=MarsInversion
+#program1=tipsvSingle
+
+#all : $(program0) $(program1)
+all : $(program0)
+
+$(program0): $(OBJS)
+	$(FC) $(FFLAGS) $(OBJS0)  -o $@ 
+
+#$(program1): $(OBJS2)
+#                $(FC) $(FFLAGS) $(OBJS2)  -o $@ 
+                
+clean:
+	rm -f MarsInversion *.o *.mod

@@ -1,0 +1,31 @@
+# 
+# This is the meta information file for MT inversion for one station 3-component seismograms 
+# 
+# The use should sample with the same dt and should not filter the seismograms beforehand
+#
+#                                                                     Nov. 2019 N. Fuji
+#
+# synthetics <moment tensor>_sta_<station_number>.txt, col 1 = time, col 2 = N, col 3 = E, col 4 = Z 
+0.025d0  # delta t in seconds
+500.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
+# butterworth filters (order, fmin, fmax)
+4 # order (integer)
+0.01 # min frequency (in Hz)
+0.05 # max frequency (in Hz)
+# number of taper windows 
+1
+# t1, t2, t3, t4
+40.0 50.0 80.0 90.0
+# 
+# seismic data (N E Z) 
+#
+1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
+US.EYMN..BHN.M.1999-10-16T094831.396000.txt
+US.EYMN..BHE.M.1999-10-16T094831.396000.txt
+US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+# 
+# number of configurations (source location in 3D, model)
+1
+# minifiles for each configuration
+minifile0.inf
+end # this meta file should end with "end"
