@@ -8,7 +8,7 @@ subroutine invbyCG(nd,ata,atd,eps,x)
   real(kind(0d0)) :: ata(1:nd,1:nd)
   real(kind(0d0)) :: x(1:nd),r(1:nd),w(1:nd),z(1:nd),x0(1:nd),atd(1:nd)
   real(kind(0d0)) :: eps
-  real(8) :: a, b, residual,initres,threshold
+  real(8) :: a, b, residual,initres,threshold,paap
 
   x0 = 0
     
@@ -20,7 +20,7 @@ subroutine invbyCG(nd,ata,atd,eps,x)
   b = 0
 
   initres=dot_product(atd,atd)
-  threshold=eps*initrest
+  threshold=eps*initres
   
   do ii=1,nd
      r = r - a*z
@@ -71,7 +71,9 @@ subroutine pinput
   metafile=argv
   call getarg(2,argv)
   workingDir=argv
-
+  call geetarg(3,argv)
+  resultDir=argv
+  
   !write(tmpfile,"(Z5.5)") getpid()
   !tmpfile='tmpfileMarsInversion'//tmpfile
   tmpfile='tmpfileMarsInversion'
@@ -115,6 +117,7 @@ subroutine pinput
 
   do iloop=1,3
      read(1,110) obsfile
+     obsfile=trim(workingDir)//trim(obsfile)
      open(unit=10,file=obsfile,status='unknown')
      do it=1,npData
         read(10,*) obsRaw(it,iloop)
@@ -127,6 +130,7 @@ subroutine pinput
   allocate(filenames(nConfiguration))
   do iloop=1,nConfiguration
      read(1,110) filenames(iloop)
+     filenames(iloop)=trim(workingDir)//trim(filenames(iloop))
   enddo
 
 

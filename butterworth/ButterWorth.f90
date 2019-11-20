@@ -18,7 +18,8 @@ program mtInversion
   real(kind(0d0)), allocatable :: taper(:)
   real(kind(0d0)), allocatable :: tmparray(:,:,:)
   real(kind(0d0)), allocatable :: GreenArray(:,:,:)
-  real(kind(0d0)), allocatable :: obsArray(:,:)
+  real(kind(0d0)), allocatable :: obsArray(:,:),obsRawArray(:,:)
+  real(kind(0d0)), allocatable :: modArray(:,:),modRawArray(:,:)
   real(kind(0d0)), allocatable :: filtbefore(:),filtafter(:)
   real(kind(0d0)) :: xfwin
   real(kind(0d0)) :: ata(1:nmt,1:nmt),atd(1:nmt)
@@ -69,7 +70,7 @@ program mtInversion
 
   allocate(tmparray(1:np,1:3,1:nmt))
   allocate(GreenArray(1:np,1:3,1:nmt))
-  allocate(obsArray(1:np,1:3))
+  allocate(obsArray(1:np,1:3),obsRawArray(1:np,1:3))
   allocate(filtbefore(1:np),filtafter(1:np))
 
 
@@ -127,7 +128,7 @@ program mtInversion
      ata=0.d0
      do mtcomp=1,nmt
         do jmtcomp=1,mtcomp
-           ata(mtcomp,jmtcomp)=sum(GreenArray(1:np,1:icomp,mtcomp)*GreenArray(1:np,1:icomp,jmtcomp))
+           ata(mtcomp,jmtcomp)=sum(GreenArray(1:np,1:3,mtcomp)*GreenArray(1:np,1:3,jmtcomp))
         enddo
      enddo
      
@@ -181,16 +182,49 @@ program mtInversion
      
      do iMovingWindow=1,(npData-np+1)
         do icomp=1,3
-           obsArray(1:np,icomp)=obsFilt(iMovingWindow:iMovingWindow+np-1,icomp)*taper(1:np)
+           obsRawArray(1:np,icomp)=obsFilt(iMovingWindow:iMovingWindow+np-1,icomp)
+           obsArray(1:np,icomp)=obsRawArray(1:np,icomp)*taper(1:np)
         enddo
         atd=0.d0
         ! Atd construction
         
-        do 
-           
+        do mtcomp=1,nmt
+           atd=sum(GreenArray(1:np,1:3,mtcomp)*obsArray(1:np,1:3))
+        enddo
+       
+        ! MT inversion by CG
+        call invbyCG(nmt,ata,atd,eps,mtInverted(1:nmt,iMovingWindow,iConfiguration))
+        
+        ! residual evaluation with/without tapering
+        modRawArray=0.d0
+        modArray=0.d0
+        do mtcomp=1,nmt
+           modRawArray(1:np,1:3)=modRawArray(1:np,1:3) &
+                +tmparray(1:np,1:3,mtcomp)*mtInverted(mtcomp,iMovingWindow,iConfiguration)
+           modArray(1:np,1:3)=modArray(1:np,1:3) &
+                +GreenArray(1:np,1:3,mtcomp)*mtInverted(mtcomp,iMovingWindow,iConfiguration)
+        enddo
+        
+        open(unit=21,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
+             //"modRaw.dat",status='unknown')
+        open(unit=22,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
+              //"mod.dat",status='unknown')
+        open(unit=23,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
+             //"obsRaw.dat",status='unknown')
+        open(unit=24,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
+              //"obs.dat",status='unknown')       
 
+        do it=1,np
+           write(21,*) dt*dble(it), modRawArray(it,1), modRawArray(it,2), modRawArray(it,3)
+           write(22,*) dt*dble(it), modArray(it,1), modArray(it,2), modArray(it,3)
+           write(23,*) dt*dble(it), obsRawArray(it,1), obsRawArray(it,2), obsRawArray(it,3)
+           write(24,*) dt*dble(it), obsArray(it,1), obsArray(it,2), obsArray(it,3)
+        enddo
 
+        close(21)
+        close(22)
 
+        
         
      enddo
      

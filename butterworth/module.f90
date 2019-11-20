@@ -15,7 +15,8 @@ module parameters
   character(200), allocatable :: filenames(:)
   real(kind(0d0)), allocatable :: obsRaw(:,:), obsFilt(:,:)
   integer :: calculMode ! 0=normal; 1=filter and stop 
-  character(200) :: workingDir 
+  character(200) :: workingDir
+  character(200) :: resultDir 
   integer :: nConfiguration ! The number of configurations (source location in 3D space, model)
 
 
