@@ -22,14 +22,16 @@ program mtInversion
   real(kind(0d0)), allocatable :: modArray(:,:),modRawArray(:,:)
   real(kind(0d0)), allocatable :: filtbefore(:),filtafter(:)
   real(kind(0d0)) :: xfwin
-  real(kind(0d0)) :: ata(1:nmt,1:nmt),atd(1:nmt)
-  real(kind(0d0)) :: mtInverted(1:nmt,1:npData-np+1,1:nConfiguration)
-  real(kind(0d0)) :: misfitTaper(1:nmt,1:npData-np+1,1:nConfiguration)
-  real(kind(0d0)) :: misfitRaw(1:nmt,1:npData-np+1,1:nConfiguration)
+  real(kind(0d0)), allocatable :: ata(:,:),atd(:)
+  real(kind(0d0)), allocatable  :: mtInverted(:,:,:)
+  real(kind(0d0)), allocatable :: misfitTaper(:,:,:)
+  real(kind(0d0)), allocatable :: misfitRaw(:,:,:)
   character(200) :: synfile
   real(kind(0d0)) :: dummyFloat
-  
-
+  real(kind(0d0)), allocatable :: varZ(:,:),varN(:,:),varE(:,:)
+  real(kind(0d0)), allocatable :: modZ(:,:),modN(:,:),modE(:,:)
+  real(kind(0d0)), allocatable :: varRawZ(:,:),varRawN(:,:),varRawE(:,:)
+  real(kind(0d0)), allocatable :: modRawZ(:,:),modRawN(:,:),modRawE(:,:)
 110 format(a200)
   ! making taper function
 
@@ -39,6 +41,28 @@ program mtInversion
   !print *, itwin(1:4,1)
 
   allocate(taper(1:np))
+
+
+  allocate(ata(1:nmt,1:nmt))
+  allocate(atd(1:nmt))
+  allocate(mtInverted(1:nmt,1:npData-np+1,1:nConfiguration))
+  allocate(misfitTaper(1:nmt,1:npData-np+1,1:nConfiguration))
+  allocate(misfitRaw(1:nmt,1:npData-np+1,1:nConfiguration))
+
+  allocate(varZ(1:npData-np+1,1:Configuration))
+  allocate(varN(1:npData-np+1,1:Configuration))
+  allocate(varE(1:npData-np+1,1:Configuration))
+  allocate(modZ(1:npData-np+1,1:Configuration))
+  allocate(modN(1:npData-np+1,1:Configuration))
+  allocate(modE(1:npData-np+1,1:Configuration))     
+
+  allocate(varRawZ(1:npData-np+1,1:Configuration))
+  allocate(varRawN(1:npData-np+1,1:Configuration))
+  allocate(varRawE(1:npData-np+1,1:Configuration))
+  allocate(modRawZ(1:npData-np+1,1:Configuration))
+  allocate(modRawN(1:npData-np+1,1:Configuration))
+  allocate(modRawE(1:npData-np+1,1:Configuration))     
+
 
   taper=0.d0
   do iWindow=1,ntwin
@@ -214,11 +238,40 @@ program mtInversion
         open(unit=24,file=resultDir//iConfiguration//"_"//iMovingWindow//"_" &
               //"obs.dat",status='unknown')       
 
+        varZ(iMovingWindow,iConfiguration)=0.d0
+        varN(iMovingWindow,iConfiguration)=0.d0
+        varE(iMovingWindow,iConfiguration)=0.d0
+        modZ(iMovingWindow,iConfiguration)=0.d0
+        modN(iMovingWindow,iConfiguration)=0.d0
+        modE(iMovingWindow,iConfiguration)=0.d0
+        varRawZ(iMovingWindow,iConfiguration)=0.d0
+        varRawN(iMovingWindow,iConfiguration)=0.d0
+        varRawE(iMovingWindow,iConfiguration)=0.d0
+        modRawZ(iMovingWindow,iConfiguration)=0.d0
+        modRawN(iMovingWindow,iConfiguration)=0.d0
+        modRawE(iMovingWindow,iConfiguration)=0.d0
+
         do it=1,np
+
            write(21,*) dt*dble(it), modRawArray(it,1), modRawArray(it,2), modRawArray(it,3)
            write(22,*) dt*dble(it), modArray(it,1), modArray(it,2), modArray(it,3)
            write(23,*) dt*dble(it), obsRawArray(it,1), obsRawArray(it,2), obsRawArray(it,3)
            write(24,*) dt*dble(it), obsArray(it,1), obsArray(it,2), obsArray(it,3)
+
+           varZ=varZ+obsArray(it,1)**2
+           varN=varN+obsArray(it,2)**2
+           varE=varE+obsArray(it,3)**2
+           modZ=modZ+(modArray(it,1)-obsArray(it,1))**2
+           modN=modN+(modArray(it,2)-obsArray(it,2))**2
+           modE=modE+(modArray(it,3)-obsArray(it,3))**2
+
+           varRawZ=varZ+obsRawArray(it,1)**2
+           varRawN=varN+obsRawArray(it,2)**2
+           varRawE=varE+obsRawArray(it,3)**2
+           modRawZ=modZ+(modRawArray(it,1)-obsRawArray(it,1))**2
+           modRawN=modN+(modRawArray(it,2)-obsRawArray(it,2))**2
+           modRawE=modE+(modRawArray(it,3)-obsRawArray(it,3))**2
+
         enddo
 
         close(21)
