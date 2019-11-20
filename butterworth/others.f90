@@ -64,7 +64,7 @@ subroutine pinput
   character(200) :: obsfile
   character(200) :: dummy
   !integer, external :: getpid
-
+  real(kind(0d0)) :: movingWindowStep
   integer :: iloop,it
 
   call getarg(1,argv)
@@ -99,6 +99,9 @@ subroutine pinput
   read(1,*) dt
   read(1,*) tlen
   np=int(tlen/dt)
+  read(1,*) movingWindowStep
+  ntStep=int(movingWindowStep/dt)
+
   read(1,*) npButterworth
   read(1,*) fmin
   read(1,*) fmax

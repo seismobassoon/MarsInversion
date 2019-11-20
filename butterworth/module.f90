@@ -8,6 +8,7 @@ module parameters
   integer, parameter :: nmt = 6
   integer :: np ! integer length of synthetics (to be considered)
   integer :: npData ! integer lenght of observed 
+  integer :: ntStep
   real(kind(0d0)) :: dt, tlen, tlenData 
   real(kind(0d0)), allocatable :: twin(:,:)
   integer, allocatable :: itwin(:,:)

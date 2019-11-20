@@ -10,6 +10,7 @@
 test
 0.025d0  # delta t in seconds
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
+100.0d0 # moving window step in seconds
 # butterworth filters (order, fmin, fmax)
 4 # order (integer)
 0.01 # min frequency (in Hz)
