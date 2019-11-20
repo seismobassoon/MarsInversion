@@ -97,6 +97,9 @@ program mtInversion
   allocate(obsArray(1:np,1:3),obsRawArray(1:np,1:3))
   allocate(filtbefore(1:np),filtafter(1:np))
 
+  allocate(modArray(1:np,1:3))
+  allocate(modRawArray(1:np,1:3))
+
 
 
   ! Grande boucle pour chaque configuration
@@ -163,11 +166,11 @@ program mtInversion
      
      
      
-     do mtcomp=1,nmt
-        do jmtcomp=1,nmt
-           print *, mtcomp,jmtcomp,ata(mtcomp,jmtcomp)
-        enddo
-     enddo
+     !do mtcomp=1,nmt
+     !   do jmtcomp=1,nmt
+     !      print *, mtcomp,jmtcomp,ata(mtcomp,jmtcomp)
+     !   enddo
+     !enddo
      
      
 !!!!!!! NOW WE START MT INVERSION FOR EACH TIME iMovingWindow
@@ -212,9 +215,10 @@ program mtInversion
            atd=sum(GreenArray(1:np,1:3,mtcomp)*obsArray(1:np,1:3))
         enddo
        
+        print *, "before CG"
         ! MT inversion by CG
         call invbyCG(nmt,ata,atd,eps,mtInverted(1:nmt,iMovingWindow,iConfiguration))
-        
+        print *, "after CG"
         ! residual evaluation with/without tapering
         modRawArray=0.d0
         modArray=0.d0
@@ -230,16 +234,16 @@ program mtInversion
            if(list(jjj:jjj).eq.' ') list(jjj:jjj)='0'
         enddo
 
-        tmpfile=trim(resultDir)//trim(list)//"modRaw.dat"
+        tmpfile=trim(resultDir)//'/'//trim(list)//"modRaw.dat"
         open(unit=21,file=tmpfile,status='unknown')
 
-        tmpfile=trim(resultDir)//trim(list)//"mod.dat"
+        tmpfile=trim(resultDir)//'/'//trim(list)//"mod.dat"
         open(unit=22,file=tmpfile,status='unknown')
         
-        tmpfile=trim(resultDir)//trim(list)//"obsRaw.dat"
+        tmpfile=trim(resultDir)//'/'//trim(list)//"obsRaw.dat"
         open(unit=23,file=tmpfile,status='unknown')
 
-        tmpfile=trim(resultDir)//trim(list)//"obs.dat"
+        tmpfile=trim(resultDir)//'/'//trim(list)//"obs.dat"
         open(unit=24,file=tmpfile,status='unknown')       
 
         varZ(iMovingWindow,iConfiguration)=0.d0

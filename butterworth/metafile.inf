@@ -29,6 +29,6 @@ US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
 # number of configurations (source location in 3D, model)
 2
 # minifiles for each configuration
-minifile0.inf
-minifile1.inf
+mininffile0.inf
+mininffile1.inf
 end # this meta file should end with "end"

@@ -22,13 +22,13 @@ test
 # seismic data (N E Z) 
 #
 1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
-../data/US.EYMN..BHN.M.1999-10-16T094831.396000.txt
-../data/US.EYMN..BHE.M.1999-10-16T094831.396000.txt
-../data/US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+US.EYMN..BHN.M.1999-10-16T094831.396000.txt
+US.EYMN..BHE.M.1999-10-16T094831.396000.txt
+US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
 # 
 # number of configurations (source location in 3D, model)
 2
 # minifiles for each configuration
-minifile0.inf
-minifile1.inf
+mininfile0.inf
+mininfile1.inf
 end # this meta file should end with "end"
