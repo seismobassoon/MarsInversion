@@ -143,7 +143,7 @@ program mtInversion
      close(12)
      close(13)
 
-
+     if(calculMode.eq.1) stop
 
      
      ! Construct AtA
@@ -294,9 +294,26 @@ program mtInversion
      enddo
      
      
-    
-     
   enddo
+
+
+  open(unit=1,file=inversionName//".inv_result",status='unknown')
+  open(unit=2,file=inversionName//".raw_var",status='unknown')
+  open(unit=3,file=inversionName//".tap_var",status='unknown')
+  do iConfiguration=1,nConfiguration
+     do iMovingWindow=1,(npData-np+1)
+        write(1,*) iConfiguration, dble(iMovingWindow)*dt, mtInverted(1:nmt,iMovingWindow,iConfiguration)
+        write(2,*) iConfiguration, dble(iMovingWindow)*dt, &
+             modRawZ(iMovingWindow,iConfiguration),modRawN(iMovingWindow,iConfiguration), &
+             modRawE(iMovingWindow,iConfiguration)
+        write(3,*) iConfiguration, dble(iMovingWindow)*dt, &
+             modZ(iMovingWindow,iConfiguration),modN(iMovingWindow,iConfiguration), &
+             modE(iMovingWindow,iConfiguration)
+     enddo
+  enddo
+  close(1)
+  close(2)
+  
      
  
   

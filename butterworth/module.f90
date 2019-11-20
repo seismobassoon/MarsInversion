@@ -17,6 +17,7 @@ module parameters
   integer :: calculMode ! 0=normal; 1=filter and stop 
   character(200) :: workingDir
   character(200) :: resultDir 
+  character(200) :: inversionName
   integer :: nConfiguration ! The number of configurations (source location in 3D space, model)
 
 

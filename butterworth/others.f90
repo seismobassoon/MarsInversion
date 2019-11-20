@@ -71,8 +71,10 @@ subroutine pinput
   metafile=argv
   call getarg(2,argv)
   workingDir=argv
-  call geetarg(3,argv)
+  call getarg(3,argv)
   resultDir=argv
+  call getarg(4,argv)
+  inversionName=argv
   
   !write(tmpfile,"(Z5.5)") getpid()
   !tmpfile='tmpfileMarsInversion'//tmpfile
