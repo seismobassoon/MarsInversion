@@ -1,3 +1,4 @@
+test                                                                                                                                                                                                    
 0.025d0  # delta t in seconds                                                                                                                                                                           
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)                                                                                     
 4 # order (integer)                                                                                                                                                                                     
@@ -6,9 +7,9 @@
 1                                                                                                                                                                                                       
 400.0 410.0 480.0 500.0                                                                                                                                                                                 
 1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above                                                                          
-../data/US.EYMN..BHN.M.1999-10-16T094831.396000.txt                                                                                                                                                     
-../data/US.EYMN..BHE.M.1999-10-16T094831.396000.txt                                                                                                                                                     
-../data/US.EYMN..BHZ.M.1999-10-16T094831.396000.txt                                                                                                                                                     
+US.EYMN..BHN.M.1999-10-16T094831.396000.txt                                                                                                                                                             
+US.EYMN..BHE.M.1999-10-16T094831.396000.txt                                                                                                                                                             
+US.EYMN..BHZ.M.1999-10-16T094831.396000.txt                                                                                                                                                             
 2                                                                                                                                                                                                       
 minifile0.inf                                                                                                                                                                                           
 minifile1.inf                                                                                                                                                                                           

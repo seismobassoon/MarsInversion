@@ -109,6 +109,7 @@ program mtInversion
      open(unit=1,file=filenames(iConfiguration),status='unknown')
      do mtcomp=1,nmt
         read(1,110) synfile
+        synfile=trim(workingDir)//"/"//trim(synfile)
         open(unit=10,file=synfile,status='unknown')
         do it=1,np
            read(10,*) dummyFloat,tmparray(it,1,mtcomp),tmparray(it,2,mtcomp),tmparray(it,3,mtcomp)

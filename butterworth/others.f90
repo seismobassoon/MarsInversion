@@ -119,7 +119,7 @@ subroutine pinput
 
   do iloop=1,3
      read(1,110) obsfile
-     obsfile=trim(workingDir)//trim(obsfile)
+     obsfile=trim(workingDir)//"/"//trim(obsfile)
      open(unit=10,file=obsfile,status='unknown')
      do it=1,npData
         read(10,*) obsRaw(it,iloop)
@@ -132,7 +132,7 @@ subroutine pinput
   allocate(filenames(nConfiguration))
   do iloop=1,nConfiguration
      read(1,110) filenames(iloop)
-     filenames(iloop)=trim(workingDir)//trim(filenames(iloop))
+     filenames(iloop)=trim(workingDir)//"/"//trim(filenames(iloop))
   enddo
 
 
