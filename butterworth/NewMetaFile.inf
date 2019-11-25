@@ -6,17 +6,34 @@
 #                                                                     Nov. 2019 N. Fuji
 #
 #   usage:   ./MarsInversion metafile.inf ../data result testInv
+#       or   ./MarsInversion metafile.inf ../RSGT result testInv
 #
 # synthetics <moment tensor>_sta_<station_number>.txt, col 1 = time, col 2 = N, col 3 = E, col 4 = Z 
 # computation mode (normal:normal; test:filter the GF and stop: fort.11-14)
-normal
-0.025d0  # delta t in seconds
+#   versionSGT is completely different
+versionSGT
+#
+# first SGTinfo
+../database.inf
+# parentDIr
+../RSGT_DWAKr
+# eventName
+sol173
+# stationName
+ELSE
+# stla, stlo
+34.54 -116.39
+#
+# 
+0.1d0  # delta t in seconds
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
 100.0d0 # moving window step in seconds (normally smaller than the dominant period?)
 # butterworth filters (order, fmin, fmax)
 4 # order (integer)
 0.01 # min frequency (in Hz)
 0.05 # max frequency (in Hz)
+# SGT version has window cutting option
+0.0 1000.0
 # number of taper windows 
 1
 # t1, t2, t3, t4
@@ -25,37 +42,9 @@ normal
 # 
 # seismic data (N E Z) 
 #
-1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
-US.EYMN..BHN.M.1999-10-16T094831.396000.txt
-US.EYMN..BHE.M.1999-10-16T094831.396000.txt
-US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
-# here we use fake data with MT=/1.d0,2.d0,-10.d0,1.d0,3.d0,-2.d0/
-#1000.d0
-#fakeZ.data.fake
-#fakeN.data.fake
-#fakeE.data.fake
+800.0d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
+resam.BHZ
+resam.BHN
+resam.BHE
 # 
-# number of configurations (source location in 3D, model)
-20
-# minifiles for each configuration
-mininffile0.inf
-mininffile1.inf
-mininffile2.inf
-mininffile3.inf
-mininffile4.inf
-mininffile5.inf
-mininffile6.inf
-mininffile7.inf
-mininffile8.inf
-mininffile9.inf
-mininffile10.inf
-mininffile11.inf
-mininffile12.inf
-mininffile13.inf
-mininffile14.inf
-mininffile15.inf
-mininffile16.inf
-mininffile17.inf
-mininffile18.inf
-mininffile19.inf
 end # this meta file should end with "end"

@@ -20,6 +20,20 @@ module parameters
   character(200) :: resultDir 
   character(200) :: inversionName
   integer :: nConfiguration ! The number of configurations (source location in 3D space, model)
-
-
+  character(200) :: SGTinfo
+  character(200) :: parentDir
+  character(200) :: eventName
+  character(200) :: stationName
+  real(kind(0d0)) :: stla,stlo
+  character(120) :: INFO_TSGT,INFO_RSGT,rsampletxt,modelcard
+  character(120) :: Poutputdir,psvmodel,modelname,DSMconfFile
+  integer :: imin,imax,maxlmax
+  real(kind(0d0)) :: omegai
+  real(kind(0d0)) :: r0delta,r0max,r0min,ratc,ratl,rdelta_,re,rmax_,rmin_
+  integer :: rsgtswitch,synnswitch,tsgtswitch
+  real(kind(0d0)) :: thetadelta,thetamax,thetamin
+  real(kind(0d0)) :: tlenFull
+  integer :: r_n, theta_n,iWindowStart,iWindowEnd,lsmooth,np0,np1
+  real(kind(0d0)), allocatable :: r_(:),thetaD(:),omega(:)
+  real(kind(0d0)) :: dtn,start,end,samplingHz
 end module parameters

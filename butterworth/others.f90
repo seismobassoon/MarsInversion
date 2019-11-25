@@ -11,6 +11,7 @@ subroutine pinput
   !integer, external :: getpid
   real(kind(0d0)) :: movingWindowStep
   integer :: iloop,it
+  character(200) :: commandline
 
   call getarg(1,argv)
   metafile=argv
@@ -28,6 +29,8 @@ subroutine pinput
      print *, "cheers"
      stop
   endif
+
+  
 
   
   !write(tmpfile,"(Z5.5)") getpid()
@@ -48,57 +51,316 @@ subroutine pinput
 
   open(unit=1,file=tmpfile,status='unknown')
   calculMode=0
-  read(1,110) dummy
-  if(dummy(1:4).eq.'test') calculMode=1
-  read(1,*) dt
-  read(1,*) tlen
-  np=int(tlen/dt)
-  read(1,*) movingWindowStep
-  ntStep=int(movingWindowStep/dt)
-
-  read(1,*) npButterworth
-  read(1,*) fmin
-  read(1,*) fmax
-  read(1,*) ntwin
-  allocate(twin(1:4,1:ntwin))
-  allocate(itwin(1:4,1:ntwin))
-  do iloop=1,ntwin
-     read(1,*) twin(1,iloop),twin(2,iloop),twin(3,iloop),twin(4,iloop)
-  enddo
-  itwin=int(twin/dt)
-  read(1,*) tlenData
-  npData = int(tlenData/dt)
-
-  allocate(obsRaw(1:npData,1:3))
-  allocate(obsFilt(1:npData,1:3))
-  
 
 
-  do iloop=1,3
-     read(1,110) obsfile
-     obsfile=trim(workingDir)//"/"//trim(obsfile)
-     open(unit=10,file=obsfile,status='unknown')
-     do it=1,npData
-        read(10,*) obsRaw(it,iloop)
+  read(1,110) dummy ! This dummy string determines i) test mode, ii) Alice normal mode, or iii) versionSGT mode
+
+  if(dummy(1:10).eq.'versionSGT') then
+     read(1,110) SGTinfo
+     SGTinfo = trim(SGTinfo)
+     read(1,110) parentDir
+     parentDir = trim(parentDir)
+     read(1,110) eventName
+     eventName = trim(eventName)
+     read(1,110) stationName
+     stationName = trim(stationName)
+     read(1,*) stla, stlo
+     read(1,*) dt
+     read(1,*) tlen
+     np=int(tlen/dt)
+     read(1,*) movingWindowStep
+     ntStep=int(movingWindowStep/dt)
+
+     read(1,*) npButterworth
+     read(1,*) fmin
+     read(1,*) fmax
+     read(1,*) start, end ! onllly available for RSGT version 
+     read(1,*) ntwin
+     allocate(twin(1:4,1:ntwin))
+     allocate(itwin(1:4,1:ntwin))
+     do iloop=1,ntwin
+        read(1,*) twin(1,iloop),twin(2,iloop),twin(3,iloop),twin(4,iloop)
      enddo
-     close(10)
-  enddo
-        
+     itwin=int(twin/dt)
+     read(1,*) tlenData
+     npData = int(tlenData/dt)
 
-  read(1,*) nConfiguration
-  allocate(filenames(nConfiguration))
-  do iloop=1,nConfiguration
-     read(1,110) filenames(iloop)
-     filenames(iloop)=trim(workingDir)//"/"//trim(filenames(iloop))
-  enddo
+     allocate(obsRaw(1:npData,1:3))
+     allocate(obsFilt(1:npData,1:3))
 
 
 
+     do iloop=1,3
+        read(1,110) obsfile
+        obsfile=trim(workingDir)//"/"//trim(obsfile)
+        open(unit=10,file=obsfile,status='unknown')
+        do it=1,npData
+           read(10,*) obsRaw(it,iloop)
+        enddo
+        close(10)
+     enddo
+
+     commandline = 'mkdir -p '//trim(parentDir)
+     call system(commandline)
+     call pinputDSM(DSMconfFile,PoutputDir,psvmodel,modelname,tlenFull,rmin_,rmax_,rdelta_,r0min,r0max,r0delta,thetamin,thetamax,thetadelta,imin,imax,rsgtswitch,tsgtswitch,synnswitch,SGTinfo)
+     call readDSMconf(DSMconfFile,re,ratc,ratl,omegai,maxlmax)
+     
+
+
+     call readpsvmodel(psvmodel,tmpfile)
+     INFO_TSGT = trim(parentDir)//"/INFO_TSGT.TXT"
+     INFO_RSGT = trim(parentDir)//"/INFO_RSGT.TXT"
+     rsampletxt = trim(parentDir)//"/rsample.txt"
+     modelcard = trim(parentDir)//"/"//trim(modelname)//".card"
+
+     !synnfile = trim(parentDir)//"/"//trim(stationName)//"."//trim(eventName)//"."//trim(compo)//"s.dat"
+
+     
+     r_n = int((rmax_-rmin_)/rdelta_)+1
+     allocate(r_(1:r_n))
+     do iloop=1,r_n
+        r_(iloop) = rmin_ + dble(iloop-1)*rdelta_
+     enddo
+
+     theta_n = int((thetamax-thetamin)/thetadelta)+1
+     allocate(thetaD(1:theta_n))
+     do iloop=1,theta_n
+        thetaD(iloop) = thetamin + dble(iloop-1)*thetadelta
+     enddo
+     
+     ! lsmoothfinder for FFT
+     np0=imax
+     call lsmoothfinder(tlenFull,np0,samplingHz,lsmooth)
+     iloop=1
+     do while (iloop<lsmooth)
+        iloop = iloop*2
+     enddo
+     lsmooth = iloop
+     iloop = 0
+     np1 = 1
+     do while (np1<np0)
+        np1 = np1*2
+     enddo
+     np1 = np1*lsmooth
+
+     ! redefinition of samplingHz
+     samplingHz = dble(2*np1)/tlenFull
+     dtn = 1.d0/samplingHz
+     iWindowStart = int(start*samplingHz)
+     iWindowEnd   = int(end*samplingHz)
+
+
+
+     ! allocate SGTs, synthetics in frequency
+     allocate(omega(imin:imax))
+     do iloop = imin, imax
+        omega(iloop) = 2.d0*pi*dble(iloop)/tlenFull
+     enddo
+     
+     nConfiguration=r_n*theta_n
+
+  elseif((dummy(1:6).eq.'normal').or.(dummy(1:4).eq.'test')) then
+     if(dummy(1:4).eq.'test') calculMode=1
+     read(1,*) dt
+     read(1,*) tlen
+     np=int(tlen/dt)
+     read(1,*) movingWindowStep
+     ntStep=int(movingWindowStep/dt)
+     
+     read(1,*) npButterworth
+     read(1,*) fmin
+     read(1,*) fmax
+     read(1,*) ntwin
+     allocate(twin(1:4,1:ntwin))
+     allocate(itwin(1:4,1:ntwin))
+     do iloop=1,ntwin
+        read(1,*) twin(1,iloop),twin(2,iloop),twin(3,iloop),twin(4,iloop)
+     enddo
+     itwin=int(twin/dt)
+     read(1,*) tlenData
+     npData = int(tlenData/dt)
+     
+     allocate(obsRaw(1:npData,1:3))
+     allocate(obsFilt(1:npData,1:3))
+     
+     
+     
+     do iloop=1,3
+        read(1,110) obsfile
+        obsfile=trim(workingDir)//"/"//trim(obsfile)
+        open(unit=10,file=obsfile,status='unknown')
+        do it=1,npData
+           read(10,*) obsRaw(it,iloop)
+        enddo
+        close(10)
+     enddo
+     
+     
+     read(1,*) nConfiguration
+     allocate(filenames(nConfiguration))
+     do iloop=1,nConfiguration
+        read(1,110) filenames(iloop)
+        filenames(iloop)=trim(workingDir)//"/"//trim(filenames(iloop))
+     enddo
+     
+     
+  endif
   
   close(1)
 
 end subroutine pinput
 
+
+subroutine pinputDSM(DSMconfFile,outputDir,psvmodel,modelname,tlen,rmin_,rmax_,rdelta_,r0min,r0max,r0delta,thetamin,thetamax,thetadelta,imin,imax,rsgtswitch,tsgtswitch,synnswitch,SGTinfo)
+  implicit none
+  !character(120), parameter :: tmpfile='tmpworkingfile_for_SGTcalcul'
+  character(120) :: dummy,outputDir,psvmodel,modelname,DSMconfFile,SGTinfo
+  real(kind(0d0)) :: tlen,rmin_,rmax_,rdelta_,r0min,r0max,r0delta
+  real(kind(0d0)) :: thetamin,thetamax,thetadelta
+  integer :: imin,imax,rsgtswitch,tsgtswitch,synnswitch
+  integer, external :: getpid
+  character(120) :: tmpfile
+
+  !write(tmpfile, "(Z5.5)") getpid()
+  !tmpfile='tmpworkingfile_for_SGTcalcul'//tmpfile
+  tmpfile='tmpworkingfile_for_SGTcalcul'
+
+  open(unit=2, file=SGTinfo)
+  open(unit=1, file=tmpfile,status='unknown')
+100 continue
+  read(2,110) dummy
+110 format(a120)
+  if(dummy(1:1).eq.'#') goto 100
+  if(dummy(1:3).eq.'end') goto 120
+  write(1,110) dummy
+  goto 100
+120 continue
+  close(1)
+  close(2)
+
+  open(unit=1,file=tmpfile,status='unknown')
+  read(1,110) DSMconfFile
+  read(1,110) outputDir
+  read(1,110) psvmodel
+  read(1,110) modelname
+  outputDir=trim(outputDir)
+  psvmodel=trim(psvmodel)
+  modelname=trim(modelname)
+  read(1,*) tlen
+  read(1,*) rmin_,rmax_,rdelta_
+  read(1,*) r0min
+  r0max=r0min
+  r0delta=20.d0
+  read(1,*) thetamin,thetamax,thetadelta
+  read(1,*) imin,imax
+  read(1,*) rsgtswitch,tsgtswitch,synnswitch
+  close(1,status='delete')
+
+end subroutine pinputDSM
+
+subroutine readDSMconf(DSMconfFile,re,ratc,ratl,omegai,maxlmax)
+  implicit none
+  !character(120), parameter :: tmpfile='tmpworkingfile_for_DSMconf'
+  character(120) :: dummy,DSMconfFile
+  real(kind(0d0)) :: re,ratc,ratl,omegai
+  integer  :: maxlmax
+  integer, external :: getpid
+  character(120) :: tmpfile
+
+  !write(tmpfile,"(Z5.5)") getpid()
+  !tmpfile='tmpworkingfile_for_DSMconf'//tmpfile
+  tmpfile='tmpworkingfile_for_DSMconf'
+
+  open(unit=2, file=DSMconfFile, status='old',action='read',position='rewind')
+  open(unit=1, file=tmpfile,status='unknown')
+100 continue
+  read(2,110) dummy
+110 format(a120)
+  if(dummy(1:1).eq.'#') goto 100
+  if(dummy(1:3).eq.'end') goto 120
+  write(1,110) dummy
+  goto 100
+120 continue
+  close(1)
+  close(2)
+
+
+  open(unit=1,file=tmpfile,status='unknown')
+  read(1,*) re
+  read(1,*) ratc
+  read(1,*) ratl
+  read(1,*) omegai
+  read(1,*) maxlmax
+  close(1,status='delete')
+
+
+end subroutine readDSMconf
+
+
+subroutine readpsvmodel(psvmodel,tmpfile)
+  implicit none
+  character(120) :: psvmodel, tmpfile, dummy
+  open(unit=2, file=psvmodel, status='old',action='read',position='rewind')
+  open(unit=1, file=tmpfile,status='unknown')
+100 continue
+  read(2,110) dummy
+110 format(a120)
+  if(dummy(1:1).eq.'#') goto 100
+  if(dummy(1:3).eq.'end') goto 120
+  write(1,110) dummy
+  goto 100
+120 continue
+  close(1)
+  close(2)
+end subroutine readpsvmodel
+
+
+subroutine translat(geodetic,geocentric)
+
+  implicit none
+  real(kind(0d0)),parameter ::  flattening = 1.d0 / 298.25d0
+  real(kind(0d0)), parameter :: pi = 3.1415926535897932d0
+  real(kind(0d0)) :: geocentric, geodetic
+  integer :: flag
+  flag = 0
+  if(geodetic .gt. 90.d0) then
+     geodetic = 1.8d2 - geodetic
+     flag = 1
+  endif
+
+  geodetic = geodetic / 1.8d2 * pi
+  geocentric = datan((1.d0-flattening)*(1.d0-flattening)* dtan(geodetic) )
+  geocentric = geocentric * 1.8d2 / pi
+
+  if(flag .eq. 1) then
+     geocentric = 1.8d2 - geocentric
+  endif
+
+  return
+end subroutine translat
+
+
+subroutine lsmoothfinder (tlen, np0, freq, lsmooth)
+
+  implicit none
+  real(kind(0d0)) :: tlen, freq
+  integer :: np0, np, lsmooth, i
+  np = 1
+  do while (np<np0)
+     np = np*2
+  enddo
+  lsmooth = int(0.5*tlen*freq/dble(np))
+  i = 1
+
+  do while (i<lsmooth)
+     i = i*2
+  enddo
+
+  lsmooth = i
+
+  return
+
+end subroutine lsmoothfinder
 
 
 subroutine inverse(aa,c,n)
@@ -197,7 +459,8 @@ subroutine invbyCG(nd,ata,atd,eps,x)
 
   x0 = 0.d0
     
-  r = atd - matmul(ata,x0)
+  !r = atd - matmul(ata,x0)
+  r = atd
   w = -r
   z = matmul(ata,w)
   a = dot_product(r,w) / dot_product(w,z)

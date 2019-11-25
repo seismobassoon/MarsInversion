@@ -25,37 +25,19 @@ normal
 # 
 # seismic data (N E Z) 
 #
-1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
-US.EYMN..BHN.M.1999-10-16T094831.396000.txt
-US.EYMN..BHE.M.1999-10-16T094831.396000.txt
-US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+#1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
+#US.EYMN..BHN.M.1999-10-16T094831.396000.txt
+#US.EYMN..BHE.M.1999-10-16T094831.396000.txt
+#US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
 # here we use fake data with MT=/1.d0,2.d0,-10.d0,1.d0,3.d0,-2.d0/
-#1000.d0
-#fakeZ.data.fake
-#fakeN.data.fake
-#fakeE.data.fake
+1000.d0
+fakeZ.data.fake
+fakeN.data.fake
+fakeE.data.fake
 # 
 # number of configurations (source location in 3D, model)
-20
+2
 # minifiles for each configuration
 mininffile0.inf
 mininffile1.inf
-mininffile2.inf
-mininffile3.inf
-mininffile4.inf
-mininffile5.inf
-mininffile6.inf
-mininffile7.inf
-mininffile8.inf
-mininffile9.inf
-mininffile10.inf
-mininffile11.inf
-mininffile12.inf
-mininffile13.inf
-mininffile14.inf
-mininffile15.inf
-mininffile16.inf
-mininffile17.inf
-mininffile18.inf
-mininffile19.inf
 end # this meta file should end with "end"

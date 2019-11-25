@@ -9,26 +9,29 @@
 #
 # synthetics <moment tensor>_sta_<station_number>.txt, col 1 = time, col 2 = N, col 3 = E, col 4 = Z 
 # computation mode (normal:normal; test:filter the GF and stop: fort.11-14)
-normal
-0.025d0  # delta t in seconds
-1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
-100.0d0 # moving window step in seconds (normally smaller than the dominant period?)
+test
+1.d-1  # delta t in seconds
+890.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
+5.0d0 # moving window step in seconds (normally smaller than the dominant period?)
 # butterworth filters (order, fmin, fmax)
 4 # order (integer)
-0.01 # min frequency (in Hz)
-0.05 # max frequency (in Hz)
+0.d0 # min frequency (in Hz)
+0.3d0 # max frequency (in Hz)
 # number of taper windows 
 1
 # t1, t2, t3, t4
 #400.0 410.0 480.0 500.0
-0.0 200.0 800.0 1000.0
+160.0 400.0 600.0 800.0
 # 
-# seismic data (N E Z) 
+# seismic data (Z N E) 
 #
-1841.2d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
-US.EYMN..BHN.M.1999-10-16T094831.396000.txt
-US.EYMN..BHE.M.1999-10-16T094831.396000.txt
-US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+800.d0 # total length of the seismic data in seconds, this should be bigger than the synthetic window length described above
+#US.EYMN..BHN.M.1999-10-16T094831.396000.txt
+#US.EYMN..BHE.M.1999-10-16T094831.396000.txt
+#US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
+resam.BHZ
+resam.BHN
+resam.BHE
 # here we use fake data with MT=/1.d0,2.d0,-10.d0,1.d0,3.d0,-2.d0/
 #1000.d0
 #fakeZ.data.fake
@@ -38,24 +41,24 @@ US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
 # number of configurations (source location in 3D, model)
 20
 # minifiles for each configuration
-mininffile0.inf
-mininffile1.inf
-mininffile2.inf
-mininffile3.inf
-mininffile4.inf
-mininffile5.inf
-mininffile6.inf
-mininffile7.inf
-mininffile8.inf
-mininffile9.inf
-mininffile10.inf
-mininffile11.inf
-mininffile12.inf
-mininffile13.inf
-mininffile14.inf
-mininffile15.inf
-mininffile16.inf
-mininffile17.inf
-mininffile18.inf
-mininffile19.inf
+minifile0.inf
+minifile1.inf
+minifile2.inf
+minifile3.inf
+minifile4.inf
+minifile5.inf
+minifile6.inf
+minifile7.inf
+minifile8.inf
+minifile9.inf
+minifile10.inf
+minifile11.inf
+minifile12.inf
+minifile13.inf
+minifile14.inf
+minifile15.inf
+minifile16.inf
+minifile17.inf
+minifile18.inf
+minifile19.inf
 end # this meta file should end with "end"

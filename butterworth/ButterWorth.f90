@@ -38,10 +38,8 @@ program mtInversion
   ! making taper function
 
   call pinput
-
+  
   !print *, np,ntwin
-  !print *, itwin(1:4,1)
-
   allocate(taper(1:np))
 
   nTimeStep = (npData-np+1)/ntStep+1
@@ -238,6 +236,15 @@ program mtInversion
         ! MT inversion by CG
         call invbyCG(nmt,ata,atd,eps,mtInverted(1:nmt,iMovingWindowStep,iConfiguration))
     
+        ! MT inversion by CG for 5 components (without Mpp)
+
+        !call invbyCG(5,ata(1:5,1:5),atd(1:5),eps,mtInverted(1:5,iMovingWindowStep,iConfiguration))
+        !mtInverted(6,iMovingWindowStep,iConfiguration)= &
+        !     -(mtInverted(1,iMovingWindowStep,iConfiguration) &
+        !     + mtInverted(4,iMovingWindowStep,iConfiguration))
+        
+
+
         !mtInverted(1:nmt,iMovingWindowStep,iConfiguration)=matmul(atainv,atd)
 
 

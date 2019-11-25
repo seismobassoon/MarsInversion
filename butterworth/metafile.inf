@@ -12,11 +12,11 @@
 normal
 0.025d0  # delta t in seconds
 1000.0d0 # window width in seconds (this should be equal or inferior to the total length of synthetics tlen in DSM)
-100.0d0 # moving window step in seconds (normally smaller than the dominant period?)
+5.0d0 # moving window step in seconds (normally smaller than the dominant period?)
 # butterworth filters (order, fmin, fmax)
 4 # order (integer)
 0.01 # min frequency (in Hz)
-0.05 # max frequency (in Hz)
+0.2 # max frequency (in Hz)
 # number of taper windows 
 1
 # t1, t2, t3, t4
@@ -36,8 +36,26 @@ US.EYMN..BHZ.M.1999-10-16T094831.396000.txt
 #fakeE.data.fake
 # 
 # number of configurations (source location in 3D, model)
-2
+20
 # minifiles for each configuration
 mininffile0.inf
 mininffile1.inf
+mininffile2.inf
+mininffile3.inf
+mininffile4.inf
+mininffile5.inf
+mininffile6.inf
+mininffile7.inf
+mininffile8.inf
+mininffile9.inf
+mininffile10.inf
+mininffile11.inf
+mininffile12.inf
+mininffile13.inf
+mininffile14.inf
+mininffile15.inf
+mininffile16.inf
+mininffile17.inf
+mininffile18.inf
+mininffile19.inf
 end # this meta file should end with "end"
