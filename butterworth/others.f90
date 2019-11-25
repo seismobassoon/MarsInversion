@@ -51,11 +51,13 @@ subroutine pinput
 
   open(unit=1,file=tmpfile,status='unknown')
   calculMode=0
-
+  mtcomp=6
 
   read(1,110) dummy ! This dummy string determines i) test mode, ii) Alice normal mode, or iii) versionSGT mode
 
   if(dummy(1:10).eq.'versionSGT') then
+     calculMode=2
+     mtcomp=10
      read(1,110) SGTinfo
      SGTinfo = trim(SGTinfo)
      read(1,110) parentDir

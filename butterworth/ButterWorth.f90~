@@ -83,10 +83,10 @@ program mtInversion
   enddo
    
   ! this is only for the use of confirmation
-  do it=1,np
-     write(13,*) taper(it)
-  enddo
-  stop
+  !do it=1,np
+  !   write(13,*) taper(it)
+  !enddo
+  !stop
            
 
 

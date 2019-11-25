@@ -111,19 +111,25 @@ program mtInversion
 
 
      ! Lecture des fonctions de Greens a partir des fichiers dans le filenames(iConfiguration)
-
-     open(unit=1,file=filenames(iConfiguration),status='unknown')
-     do mtcomp=1,nmt
-        read(1,110) synfile
-        synfile=trim(workingDir)//"/"//trim(synfile)
-        open(unit=10,file=synfile,status='unknown')
-        do it=1,np
-           read(10,*) dummyFloat,tmparray(it,1,mtcomp),tmparray(it,2,mtcomp),tmparray(it,3,mtcomp)
+     if(calculMode.ne.2) then
+        open(unit=1,file=filenames(iConfiguration),status='unknown')
+        do mtcomp=1,nmt
+           read(1,110) synfile
+           synfile=trim(workingDir)//"/"//trim(synfile)
+           open(unit=10,file=synfile,status='unknown')
+           do it=1,np
+              read(10,*) dummyFloat,tmparray(it,1,mtcomp),tmparray(it,2,mtcomp),tmparray(it,3,mtcomp)
+           enddo
+           close(10)
         enddo
-        close(10)
-     enddo
-     close(1)
-     
+        close(1)
+     endif(calculMode.eq.1) then
+
+        ! here we construct 10 SGTs
+
+     endif
+
+     ! 
 
 
      ! Make a fake series of observed waveforms for synthetic inversion
