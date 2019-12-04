@@ -107,23 +107,48 @@ program mtInversion
   mtInverted=0.d0
   ! Grande boucle pour chaque configuration
 
+
+  if(calculMode.eq.2) then
+     allocate(rsgtomega(1:num_rsgtPSV,imin,imax,1:theta_n))
+     allocate(u(iWindowStart:iWindowEnd,1:num_rsgtPSV))
+  endif
+
+
   do iConfiguration=1,nConfiguration
-
-
-     ! Lecture des fonctions de Greens a partir des fichiers dans le filenames(iConfiguration)
-
-     open(unit=1,file=filenames(iConfiguration),status='unknown')
-     do mtcomp=1,nmt
-        read(1,110) synfile
-        synfile=trim(workingDir)//"/"//trim(synfile)
-        open(unit=10,file=synfile,status='unknown')
-        do it=1,np
-           read(10,*) dummyFloat,tmparray(it,1,mtcomp),tmparray(it,2,mtcomp),tmparray(it,3,mtcomp)
-        enddo
-        close(10)
-     enddo
-     close(1)
      
+     iConfR=iConfiguration/r_n+1
+     iConfTheta=iConfiguration%r_n+1
+     ! Lecture des fonctions de Greens a partir des fichiers dans le filenames(iConfiguration)
+     if(calculMode.ne.2) then
+        open(unit=1,file=filenames(iConfiguration),status='unknown')
+        do mtcomp=1,nmt
+           read(1,110) synfile
+           synfile=trim(workingDir)//"/"//trim(synfile)
+           open(unit=10,file=synfile,status='unknown')
+           do it=1,np
+              read(10,*) dummyFloat,tmparray(it,1,mtcomp),tmparray(it,2,mtcomp),tmparray(it,3,mtcomp)
+           enddo
+           close(10)
+        enddo
+        close(1)
+     elseif(calculMode.eq.2) then
+        iConfR=iConfiguration/r_n+1
+        iConfTheta=mod(iConfiguration,r_n)+1        
+        if(iConfTheta.eq.1) then
+        ! SSGT reading
+            call rdsgtomega(r_(iConfR),0.d0,num_rsgtPSV,num_rsgtPSV,20)
+            call rdsgtomega(r_(iConfR),0.d0,num_rsgtSH,num_rsgtPSV,10)
+        endif
+
+        ! here we construct 10 SGTs
+        call vectorFFT_double(num_rsgtPSV,imin,imax,np1,rsgtomega(1:num_rsgtPSV,imin:imax,iConfTheta),u(iWindowStart:iWindowEnd,1:num_rsgtPSV),omegai,tlenFull,iWindowStart,iWindowEnd)
+        ! NF redefine u and reconsider the order of rsgtomega
+
+        ! Hey here, we can even rotate with 360 phi!!!
+
+     endif
+
+     ! 
 
 
      ! Make a fake series of observed waveforms for synthetic inversion

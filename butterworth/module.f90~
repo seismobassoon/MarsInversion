@@ -5,7 +5,7 @@ module parameters
   integer :: npButterworth
   real(kind(0d0)) :: fmin,fmax
   real(kind(0d0)) :: eps=1.d-5 ! tolerance during MT inversion 
-  integer, parameter :: nmt = 6
+  integer :: nmt 
   integer :: np ! integer length of synthetics (to be considered)
   integer :: npData ! integer lenght of observed 
   integer :: ntStep
@@ -32,8 +32,32 @@ module parameters
   real(kind(0d0)) :: r0delta,r0max,r0min,ratc,ratl,rdelta_,re,rmax_,rmin_
   integer :: rsgtswitch,synnswitch,tsgtswitch
   real(kind(0d0)) :: thetadelta,thetamax,thetamin
+  real(kind(0d0)), parameter :: phimin=-180.d0
+  real(kind(0d0)), parameter :: phimax= 180.d0
+  real(kind(0d0)), parameter :: phidelta=1.d0
   real(kind(0d0)) :: tlenFull
-  integer :: r_n, theta_n,iWindowStart,iWindowEnd
-  real(kind(0d0)), allocatable :: r_(:),thetaD(:),omega(:)
+  integer :: r_n, theta_n,phi_n,iWindowStart,iWindowEnd,lsmooth,np0,np1
+  integer :: iConfTheta,iConfPhi,iConfR
+  real(kind(0d0)), allocatable :: r_(:),thetaD(:),phiD(:),omega(:)
   real(kind(0d0)) :: dtn,start,end,samplingHz
 end module parameters
+
+
+module tmpSGTs
+  implicit none
+  ! in frequency domain
+  complex(kind(0d0)), allocatable :: rsgtF(:,:)
+  complex(kind(0d0)), allocatable :: h3(:,:),h4(:,:)
+  complex(kind(0d0)), allocatable :: rsgtomega(:,:,:)
+  complex(kind(0d0)), allocatable :: u_freq(:)
+  ! in time domain
+  real(kind(0d0)), allocatable :: t(:),u(:),u0(:,:),v(:),v0(:,:),hu(:),hu0(:,:)
+  real(kind(0d0)), allocatable :: fwin(:,:)
+  integer, allocatable :: nt1(:),nt2(:)
+  real(kind(0d0)), allocatable :: denomv(:),denomu(:),coeff(:,:,:,:),coeffV(:,:)
+  integer, parameter :: num_rsgtPSV=10
+  integer, parameter :: num_rsgtSH=5
+  integer, parameter :: num_rsgt=10
+end module tmpSGTs
+
+

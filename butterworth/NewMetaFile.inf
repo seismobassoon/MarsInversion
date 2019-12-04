@@ -16,7 +16,7 @@ versionSGT
 # first SGTinfo
 ../database.inf
 # parentDIr
-../RSGT_DWAKr
+../databaseDWAKr/RSGT/
 # eventName
 sol173
 # stationName

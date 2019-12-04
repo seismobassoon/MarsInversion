@@ -51,13 +51,13 @@ subroutine pinput
 
   open(unit=1,file=tmpfile,status='unknown')
   calculMode=0
-  mtcomp=6
+  nmt=6
 
   read(1,110) dummy ! This dummy string determines i) test mode, ii) Alice normal mode, or iii) versionSGT mode
 
   if(dummy(1:10).eq.'versionSGT') then
      calculMode=2
-     mtcomp=10
+     nmt=6
      read(1,110) SGTinfo
      SGTinfo = trim(SGTinfo)
      read(1,110) parentDir
@@ -129,6 +129,13 @@ subroutine pinput
      do iloop=1,theta_n
         thetaD(iloop) = thetamin + dble(iloop-1)*thetadelta
      enddo
+
+     phi_n=int((phimax-phimin)/phidelta)+1
+     allocate(phiD(1:phi_n))
+     do iloop=1,phi_n
+        phiD(iloop) = phimin + dble(iloop-1)*phidelta
+     enddo
+        
      
      ! lsmoothfinder for FFT
      np0=imax
@@ -159,7 +166,7 @@ subroutine pinput
         omega(iloop) = 2.d0*pi*dble(iloop)/tlenFull
      enddo
      
-     nConfiguration=r_n*theta_n
+     nConfiguration=r_n*theta_n*phi_n
 
   elseif((dummy(1:6).eq.'normal').or.(dummy(1:4).eq.'test')) then
      if(dummy(1:4).eq.'test') calculMode=1
